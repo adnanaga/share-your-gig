@@ -26,8 +26,6 @@ render(){
     textAlign:"center"
   };
 
-  console.log(question)
-
   if(question === 1){
     helpSection = (
 <div className="greyout">
@@ -126,6 +124,16 @@ Please be mindful of the message you send. If you wouldn’t send that message t
 
   return (
     <div style={contentStyle}>
+      {confirmationScreen ?
+
+<div>All done! 
+Get ready for the upcoming missions!
+<br></br>
+<br></br>
+Icon here</div>
+
+:
+      <div>
           <div style={{ marginBottom: 40 }}>
             <h2 style={{ marginBottom: 0 }}>{numSubs}+</h2>
               subbed users
@@ -162,6 +170,8 @@ Please be mindful of the message you send. If you wouldn’t send that message t
     <button onClick={() => this.setState({confirmationScreen:true})}> Confirm</button>
     :
     <button onClick={() => this.setState({signedUp:true})}>Sign me up!</button>
+    }
+    </div>
     }
     </div>
   );

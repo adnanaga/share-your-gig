@@ -43,7 +43,7 @@ class App extends Component {
     return (
       <div>
         <Help numSubs={numSubs} styles={styles} />
-        <p style={{textAlign:"center"}}>Made by Andres Adndn Agency</p>
+        <p style={{textAlign:"center"}}>Made by Andres Adnan Agency</p>
       </div>
     );
   }
