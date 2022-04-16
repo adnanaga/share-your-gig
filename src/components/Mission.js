@@ -1,23 +1,26 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 
 class Mission extends Component {
   constructor(props) {
     super(props);
+
+    const { missionId } = this.props;
     this.state = {
-      missionId: this.props.missionId
+      missionId,
     };
   }
-  
-  
-render(){
-  let {missionId} = this.state;
-  console.log(missionId)
- return(
-<button>
-  Click herer for the mission {missionId}
-</button>
- )
-};
+
+  render() {
+    const { missionId } = this.state;
+
+    return (
+      <div>
+        <button type="button">
+          {missionId}
+        </button>
+      </div>
+    );
+  }
 }
 
 export default Mission;

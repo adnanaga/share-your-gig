@@ -1,17 +1,16 @@
-import React, { Component } from "react";
-import HelpBox from "./HelpBox";
+import React, { Component } from 'react';
+import HelpBox from './HelpBox';
 
 class Help extends Component {
   constructor(props) {
     super(props);
+    const { numSubs } = this.props;
     this.state = {
       showHelp: false,
       phoneNumber: '',
-      verificationCode: '',
-      numSubs: this.props.numSubs,
+      numSubs,
       signedUp: false,
       confirmationScreen: false,
-      question: 0,
     };
 
     this.showHelpBox = this.showHelpBox.bind(this);
@@ -20,132 +19,149 @@ class Help extends Component {
     this.checkConfirmationCode = this.checkConfirmationCode.bind(this);
   }
 
-  sendVerificationText() {
-    this.setState({
-      signedUp:true})
-    const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phoneNumber: this.state.value })
-  };
-  fetch('http://share-your-gig-dev.herokuapp.com/api/v1/subscribe/send-verification', requestOptions)
-      .then(response => response.json())
-      .then(data => {
-        // this.setState({ postId: data.id });
-          if(data.response === 'success'){
-            this.setState({value: ''})
-          }
-        });
+  handleChange(event) {
+    this.setState({ value: event.target.value });
   }
 
   checkConfirmationCode() {
     this.setState({
-      confirmationScreen:true,
+      confirmationScreen: true,
     });
+
+    const { phoneNumber, value } = this.state;
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        phoneNumber: this.state.phoneNumber,
-        confirmationCode: this.state.value 
-      })
-  };
-  fetch('http://share-your-gig-dev.herokuapp.com/api/v1/subscribe/verify', requestOptions)
-      .then(response => response.json())
-      .then(data => {
+      body: JSON.stringify({
+        phoneNumber,
+        confirmationCode: value,
+      }),
+    };
+    fetch('http://share-your-gig-dev.herokuapp.com/api/v1/subscribe/verify', requestOptions)
+      .then((response) => response.json())
+      .then((data) => {
         // this.setState({ postId: data.id });
-          if(data.response === 'success'){
-            this.setState({value: ''})
-          }
-        });
+        if (data.response === 'success') {
+          this.setState({ value: '' });
+        }
+      });
   }
 
-  handleChange(event) {
-    this.setState({value: event.target.value});
+  sendVerificationText() {
+    const { value } = this.state;
+    this.setState({ signedUp: true });
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phoneNumber: value }),
+    };
+    fetch('http://share-your-gig-dev.herokuapp.com/api/v1/subscribe/send-verification', requestOptions)
+      .then((response) => response.json())
+      .then((data) => {
+        // this.setState({ postId: data.id });
+        if (data.response === 'success') {
+          this.setState({ value: '' });
+        }
+      });
   }
 
   showHelpBox() {
-    console.log(this.state.showHelp)
+    // console.log(showHelp);
     this.setState({
       showHelp: true,
     });
   }
 
+  render() {
+    const {
+      signedUp,
+      numSubs,
+      confirmationScreen,
+      showHelp,
+      value,
+    } = this.state;
 
+    const contentStyle = {
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingRight: 40,
+      paddingLeft: 40,
+      textAlign: 'center',
+    };
 
-render(){
-  let {signedUp, 
-    numSubs, 
-    confirmationScreen, 
-    question,
-    showHelp
-  } = this.state;
+    return (
+      <div style={contentStyle}>
+        {confirmationScreen
 
-  const contentStyle = {
-    height:"90vh",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    paddingRight: 40,
-    paddingLeft:40,
-    textAlign:"center"
-  };
+          ? (
+            <div>
+              All done!
+              Get ready for the upcoming missions!
+              <br />
+              <br />
+              Icon here
 
-  return (
-    <div style={contentStyle}>
-      {confirmationScreen ?
+            </div>
+          )
 
-<div>All done! 
-Get ready for the upcoming missions!
-<br></br>
-<br></br>
-Icon here</div>
+          : (
+            <div style={{ margin: '15%' }}>
+              <div style={{ marginBottom: 40 }}>
+                <div style={{ fontSize: '40px' }}>
+                  {numSubs}
+                  +
+                </div>
+                <div style={{ fontSize: '12px' }}>
+                  subbed users
+                </div>
+                <button
+                  type="button"
+                  onClick={this.showHelpBox}
+                  style={{
+                    width: '100%',
+                    textAlign: 'right',
+                  }}
+                >
+                  ?
+                </button>
+                {showHelp
+                  ? <HelpBox key={new Date()} />
+                  : null}
 
-:
-      <div>
-          <div style={{ marginBottom: 40 }}>
-            <h2 style={{ marginBottom: 0 }}>{numSubs}+</h2>
-              subbed users
-
-              <button onClick={this.showHelpBox}>?</button>
-        {showHelp ?
-           <HelpBox key={new Date()}/> :
-           null
-        }
-
-            {signedUp ?
-              <div className="helpCopy">
-                `We sent a confirmation code to the number you provided.
-              Please enter it below.`
-              </div> 
-            :
-              <div className="helpCopy">
-                `Every day, we’ll send a simple mission via text. Solve it and get a chance to get selected. If selected, you can send a text to everyone subscribed!`
+                {signedUp
+                  ? (
+                    <div className="helpCopy">
+                      We sent a confirmation code to the number you provided.
+                      Please enter it below.
+                    </div>
+                  )
+                  : (
+                    <div className="helpCopy">
+                      Every day, we’ll send a simple mission via text.
+                      Solve it and get a chance to get selected.
+                      If selected, you can send a text to everyone subscribed!
+                    </div>
+                  )}
               </div>
-            }1
-          </div>
 
-      <div>
-        <fieldset>
-          <legend>{signedUp ? 'Confirmation Code' : 'Phone Number'}</legend>
+              <div>
+                <fieldset>
+                  <legend>{signedUp ? 'Confirmation Code' : 'Phone Number'}</legend>
 
-          <input type="text" value={this.state.value || ''} onChange={this.handleChange} />
-        </fieldset>
+                  <input type="text" value={value || ''} onChange={this.handleChange} />
+                </fieldset>
+              </div>
+
+              {signedUp
+                ? <button type="button" onClick={this.checkConfirmationCode}>Confirm</button>
+                : <button type="button" onClick={this.sendVerificationText}>Sign me up!</button>}
+            </div>
+          )}
       </div>
-
-    {signedUp ?
-    <button onClick={this.checkConfirmationCode}>Confirm</button>
-    :
-    <button onClick={this.sendVerificationText}>Sign me up!</button>
-    }
-    </div>
-    }
-    </div>
-  );
-};
+    );
+  }
 }
-
-
 
 export default Help;
