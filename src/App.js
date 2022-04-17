@@ -20,26 +20,22 @@ class App extends Component {
   }
 
   componentDidMount() {
-    // this.updateDimensions();
-    window.addEventListener('resize', this.updateDimensions);
-
     const numSubscribersURL = 'http://share-your-gig-dev.herokuapp.com/api/v1/subscribe/num-of-subscribed-users';
-
-    fetch(numSubscribersURL)
-      .then((response) => response.json())
-      .then((data) => this.setState({ numSubs: data.numSubscribedUsers, subsFetched: true }))
-      .catch((err) => {
-        console.log(err);
-      });
-
     const getMission = 'http://share-your-gig-dev.herokuapp.com/api/v1/missions/current';
 
-    fetch(getMission)
-      .then((response) => response.json())
-      .then((data) => this.setState({ missionId: data.missionId }))
-      .catch((err) => {
-        console.log(err);
+    Promise.all([fetch(numSubscribersURL), fetch(getMission)])
+
+      .then(([res1, res2]) => Promise.all([res1.json(), res2.json()]))
+      .then(([res1, res2]) => {
+        this.setState({
+          numSubs: res1.numSubscribedUsers,
+          missionId: res2.missionId,
+          subsFetched: true,
+        });
+      // set state in here
       });
+    // this.updateDimensions();
+    window.addEventListener('resize', this.updateDimensions);
   }
 
   componentWillUnmount() {
@@ -67,13 +63,13 @@ class App extends Component {
       // black: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
     };
 
-    // if (!subsFetched) {
-    //   return (
-    //     <div style={{ textAlign: 'center' }}>
-    //       <h1> Hi!</h1>
-    //     </div>
-    //   );
-    // }
+    if (!subsFetched) {
+      return (
+        <div style={{ textAlign: 'center' }}>
+          <h1> Hi!</h1>
+        </div>
+      );
+    }
 
     const dateObj = new Date();
     // Request a weekday along with a long date
@@ -91,7 +87,11 @@ class App extends Component {
               <button
                 type="button"
                 onClick={() => this.setState({ helpPage: false })}
-                style={{ marginLeft: '10vw' }}
+                style={{
+                  position: 'fixed',
+                  top: '10vh',
+                  left: '5vh',
+                }}
               >
                 <img src={arrow} alt="Back" />
               </button>

@@ -118,7 +118,6 @@ class HelpBox extends Component {
     return (
       <div>
         <div>
-          {/* {helpSection} */}
           <div className="greyout">
             <div className="whiteBox">
               <div className="whiteBoxContents">

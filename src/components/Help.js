@@ -43,6 +43,7 @@ class Help extends Component {
       fetch('http://share-your-gig-dev.herokuapp.com/api/v1/subscribe/verify', requestOptions)
         .then((response) => response.json())
         .then((data) => {
+          console.log(requestOptions)
         // this.setState({ postId: data.id });
           if (data.response === 'success') {
             this.setState({ value: '' });
@@ -62,6 +63,7 @@ class Help extends Component {
       // should error here
       console.log('undefiend');
     } else {
+      this.setState({ signedUp: true, phoneNumber: value });
       const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -109,6 +111,16 @@ class Help extends Component {
       textAlign: 'center',
     };
 
+    const subbedUsers = (
+      <div>
+        {numSubs}
+        +
+        <div style={{ fontSize: '12px' }}>
+          subbed users
+        </div>
+      </div>
+    );
+
     return (
       <div style={contentStyle}>
         {confirmationScreen
@@ -129,10 +141,7 @@ class Help extends Component {
               <div style={{ marginBottom: 40 }}>
                 <div style={{ fontSize: '40px' }}>
                   {numSubs
-                    ? `${numSubs}+
-                  <div style={{ fontSize: '12px' }}>
-                  subbed users
-                </div>`
+                    ? subbedUsers
                     : ''}
                 </div>
                 <button

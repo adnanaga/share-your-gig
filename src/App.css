@@ -20,6 +20,8 @@ fieldset {
   border: 1px solid #686868;
   box-sizing: border-box;
   border-radius: 9px;
+  display: flex;
+  justify-content: center;
 }
 
 legend {
@@ -44,24 +46,18 @@ legend {
   justify-content: space-between;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+textarea {
+  width:100%;
+  resize: none;
+  border: none;
 }
-
 
 .helpCopy {
 font-weight: 400;
 font-size: 14px;
-line-height: 144.99%;
 text-align: left;
 font-style: normal;
 font-size: 14px;
-
 color: #000000;
 }
 
@@ -81,6 +77,13 @@ color: #000000;
   height: 27px;
   font-size: 13px;
   font-weight: bold;
+}
+
+.messageInput {
+  border: none;
+  width: 90%;
+  height: 132px;
+  font-size: 13px;
 }
 
 .greyout {
