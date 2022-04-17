@@ -20,49 +20,67 @@ class Help extends Component {
   }
 
   handleChange(event) {
-    this.setState({ value: event.target.value });
+    this.setState({ value: event.target.value, showHelp: false });
   }
 
   checkConfirmationCode() {
-    this.setState({
-      confirmationScreen: true,
-    });
-
     const { phoneNumber, value } = this.state;
-    const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        phoneNumber,
-        confirmationCode: value,
-      }),
-    };
-    fetch('http://share-your-gig-dev.herokuapp.com/api/v1/subscribe/verify', requestOptions)
-      .then((response) => response.json())
-      .then((data) => {
-        // this.setState({ postId: data.id });
-        if (data.response === 'success') {
-          this.setState({ value: '' });
-        }
+    if (value === undefined) {
+      console.log('no confirmation code');
+    } else {
+      this.setState({
+        confirmationScreen: true,
       });
+
+      const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phoneNumber,
+          confirmationCode: value,
+        }),
+      };
+      fetch('http://share-your-gig-dev.herokuapp.com/api/v1/subscribe/verify', requestOptions)
+        .then((response) => response.json())
+        .then((data) => {
+        // this.setState({ postId: data.id });
+          if (data.response === 'success') {
+            this.setState({ value: '' });
+          } else {
+            // error out here
+          }
+        }).catch((err) => {
+          console.log(err);
+        });
+    }
   }
 
   sendVerificationText() {
     const { value } = this.state;
-    this.setState({ signedUp: true });
-    const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phoneNumber: value }),
-    };
-    fetch('http://share-your-gig-dev.herokuapp.com/api/v1/subscribe/send-verification', requestOptions)
-      .then((response) => response.json())
-      .then((data) => {
+
+    if (value === undefined) {
+      // should error here
+      console.log('undefiend');
+    } else {
+      const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phoneNumber: value }),
+      };
+      fetch('http://share-your-gig-dev.herokuapp.com/api/v1/subscribe/send-verification', requestOptions)
+        .then((response) => response.json())
+        .then((data) => {
         // this.setState({ postId: data.id });
-        if (data.response === 'success') {
-          this.setState({ value: '' });
-        }
-      });
+          if (data.response === 'success') {
+            this.setState({ signedUp: true, value: '' });
+          } else {
+            // error out here
+            console.log('error with number');
+          }
+        }).catch((err) => {
+          console.log(err);
+        });
+    }
   }
 
   showHelpBox() {
@@ -110,19 +128,17 @@ class Help extends Component {
             <div style={{ margin: '15%' }}>
               <div style={{ marginBottom: 40 }}>
                 <div style={{ fontSize: '40px' }}>
-                  {numSubs}
-                  +
-                </div>
-                <div style={{ fontSize: '12px' }}>
+                  {numSubs
+                    ? `${numSubs}+
+                  <div style={{ fontSize: '12px' }}>
                   subbed users
+                </div>`
+                    : ''}
                 </div>
                 <button
                   type="button"
                   onClick={this.showHelpBox}
-                  style={{
-                    width: '100%',
-                    textAlign: 'right',
-                  }}
+                  className="questionButton"
                 >
                   ?
                 </button>
@@ -150,13 +166,33 @@ class Help extends Component {
                 <fieldset>
                   <legend>{signedUp ? 'Confirmation Code' : 'Phone Number'}</legend>
 
-                  <input type="text" value={value || ''} onChange={this.handleChange} />
+                  <input className="numberInput" type="text" value={value || ''} onChange={this.handleChange} />
                 </fieldset>
               </div>
 
               {signedUp
-                ? <button type="button" onClick={this.checkConfirmationCode}>Confirm</button>
-                : <button type="button" onClick={this.sendVerificationText}>Sign me up!</button>}
+                ? (
+                  <button
+                    style={{
+                      padding: '10px 20px', marginTop: '10px', backgroundColor: '#282A37', color: '#FFFFFF', borderRadius: '35px',
+                    }}
+                    type="button"
+                    onClick={this.checkConfirmationCode}
+                  >
+                    Confirm
+                  </button>
+                )
+                : (
+                  <button
+                    style={{
+                      padding: '10px 20px', marginTop: '10px', backgroundColor: '#282A37', color: '#FFFFFF', borderRadius: '35px',
+                    }}
+                    type="button"
+                    onClick={this.sendVerificationText}
+                  >
+                    Sign me up!
+                  </button>
+                )}
             </div>
           )}
       </div>

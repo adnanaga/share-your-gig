@@ -27,13 +27,19 @@ class App extends Component {
 
     fetch(numSubscribersURL)
       .then((response) => response.json())
-      .then((data) => this.setState({ numSubs: data.numSubscribedUsers, subsFetched: true }));
+      .then((data) => this.setState({ numSubs: data.numSubscribedUsers, subsFetched: true }))
+      .catch((err) => {
+        console.log(err);
+      });
 
     const getMission = 'http://share-your-gig-dev.herokuapp.com/api/v1/missions/current';
 
     fetch(getMission)
       .then((response) => response.json())
-      .then((data) => this.setState({ missionId: data.missionId }));
+      .then((data) => this.setState({ missionId: data.missionId }))
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   componentWillUnmount() {
@@ -61,13 +67,13 @@ class App extends Component {
       // black: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
     };
 
-    if (!subsFetched) {
-      return (
-        <div style={{ textAlign: 'center' }}>
-          <h1> Hi!</h1>
-        </div>
-      );
-    }
+    // if (!subsFetched) {
+    //   return (
+    //     <div style={{ textAlign: 'center' }}>
+    //       <h1> Hi!</h1>
+    //     </div>
+    //   );
+    // }
 
     const dateObj = new Date();
     // Request a weekday along with a long date
@@ -76,34 +82,32 @@ class App extends Component {
     };
 
     const date = dateObj.toLocaleString('en-US', options);
-    // → "Donnerstag, 20. Dezember 2012"
-
-    // const dateObj = new Date();
-    // const month = dateObj.getUTCMonth() + 1; // months from 1-12
-    // const day = dateObj.getUTCDate();
-    // const year = dateObj.getUTCFullYear();
 
     return (
       <div className="main">
         {helpPage
           ? (
             <div>
-              <button type="button" onClick={() => this.setState({ helpPage: false })}>
-                <img src={arrow} alt="Submit" />
+              <button
+                type="button"
+                onClick={() => this.setState({ helpPage: false })}
+                style={{ marginLeft: '10vw' }}
+              >
+                <img src={arrow} alt="Back" />
               </button>
               <Help numSubs={numSubs} styles={styles} />
             </div>
           )
           : (
             <div className="mainPage">
-              <div className="header">
+              <header>
                 The date today is
                 <br />
                 {date}
-              </div>
+              </header>
               <Mission missionId={missionId} className="mission" />
-              <button type="button" onClick={() => this.setState({ helpPage: true })}>
-                What is this
+              <button className="whatIsThis" type="button" onClick={() => this.setState({ helpPage: true })}>
+                ?
               </button>
             </div>
           )}
