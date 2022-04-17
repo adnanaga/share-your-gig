@@ -156,13 +156,13 @@ class Mission extends Component {
     } else if (gameState === 'winnerFound') {
       page = (
         <div className="mainCopy">
-          <div>Today’s mission is over. The next one will be released shortly!</div>
+          <div style={{textAlign:"center"}}>Today’s mission is over. The next one will be released shortly!</div>
         </div>
       );
     } else if (gameState === 'expired') {
       page = (
         <div className="mainCopy">
-          <div>This link has already expired. Please try again next time!</div>
+          <div style={{textAlign:"center"}}>This link has already expired. Please try again next time!</div>
         </div>
       );
     }
@@ -173,6 +173,7 @@ class Mission extends Component {
         flexDirection: 'column',
         height: '100%',
         justifyContent: 'center',
+        alignItems: 'center',
       }}
       >
         {page}

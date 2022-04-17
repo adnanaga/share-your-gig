@@ -43,8 +43,8 @@ class Help extends Component {
       fetch('http://share-your-gig-dev.herokuapp.com/api/v1/subscribe/verify', requestOptions)
         .then((response) => response.json())
         .then((data) => {
-          console.log(requestOptions)
-        // this.setState({ postId: data.id });
+          console.log(requestOptions);
+          // this.setState({ postId: data.id });
           if (data.response === 'success') {
             this.setState({ value: '' });
           } else {
@@ -144,13 +144,15 @@ class Help extends Component {
                     ? subbedUsers
                     : ''}
                 </div>
-                <button
-                  type="button"
-                  onClick={this.showHelpBox}
-                  className="questionButton"
-                >
-                  ?
-                </button>
+                <div style={{ textAlign: 'right' }}>
+                  <button
+                    type="button"
+                    onClick={this.showHelpBox}
+                    className="questionButton"
+                  >
+                    ?
+                  </button>
+                </div>
                 {showHelp
                   ? <HelpBox key={new Date()} />
                   : null}
