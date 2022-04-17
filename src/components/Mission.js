@@ -65,6 +65,18 @@ class Mission extends Component {
           >
             click here to Win
           </button>
+          <button
+            type="button"
+            onClick={() => this.checkWin('expired')}
+          >
+            click here to expired
+          </button>
+          <button
+            type="button"
+            onClick={() => this.checkWin('winnerFound')}
+          >
+            click here to winner already found
+          </button>
         </div>
       );
     } else if (gameState === 'loss') {
@@ -139,6 +151,18 @@ class Mission extends Component {
           >
             Send!
           </button>
+        </div>
+      );
+    } else if (gameState === 'winnerFound') {
+      page = (
+        <div className="mainCopy">
+          <div>Today’s mission is over. The next one will be released shortly!</div>
+        </div>
+      );
+    } else if (gameState === 'expired') {
+      page = (
+        <div className="mainCopy">
+          <div>This link has already expired. Please try again next time!</div>
         </div>
       );
     }
