@@ -14,9 +14,16 @@ class Help extends Component {
     };
 
     this.showHelpBox = this.showHelpBox.bind(this);
+    this.handleKeyPress = this.handleKeyPress.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.sendVerificationText = this.sendVerificationText.bind(this);
     this.checkConfirmationCode = this.checkConfirmationCode.bind(this);
+  }
+
+  handleKeyPress = (event) => {
+    if(event.key === 'Enter'){
+      this.checkConfirmationCode;
+    }
   }
 
   handleChange(event) {
@@ -91,6 +98,7 @@ class Help extends Component {
       showHelp: true,
     });
   }
+
 
   render() {
     const {
@@ -177,7 +185,7 @@ class Help extends Component {
                 <fieldset>
                   <legend>{signedUp ? 'Confirmation Code' : 'Phone Number'}</legend>
 
-                  <input className="numberInput" type="text" value={value || ''} onChange={this.handleChange} />
+                  <input className="numberInput" type="text" value={value || ''} onChange={this.handleChange} onKeyPress={this.handleKeyPress}/>
                 </fieldset>
               </div>
 

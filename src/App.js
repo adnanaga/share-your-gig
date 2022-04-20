@@ -15,6 +15,7 @@ class App extends Component {
       numSubs: '',
       subsFetched: false,
       helpPage: false,
+      userKey: '',
     };
     // this.updateDimensions = this.updateDimensions.bind(this);
   }
@@ -36,6 +37,21 @@ class App extends Component {
       });
     // this.updateDimensions();
     window.addEventListener('resize', this.updateDimensions);
+
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+      get: (searchParams, prop) => searchParams.get(prop),
+    });
+    // Get the value of "some_key" in eg "https://example.com/?some_key=some_value"
+    const { key } = params; // "some_value"
+    if (key) {
+      this.setState({
+        userKey: key,
+      });
+    } else {
+      this.setState({
+        helpPage: true,
+      });
+    }
   }
 
   componentWillUnmount() {
@@ -56,6 +72,7 @@ class App extends Component {
       subsFetched,
       helpPage,
       missionId,
+      userKey,
     } = this.state;
 
     const styles = {
@@ -66,7 +83,7 @@ class App extends Component {
     if (!subsFetched) {
       return (
         <div style={{ textAlign: 'center' }}>
-          <h1> Hi!</h1>
+          <h1> Shits broke!</h1>
         </div>
       );
     }
@@ -105,7 +122,7 @@ class App extends Component {
                 <br />
                 {date}
               </header>
-              <Mission missionId={missionId} className="mission" />
+              <Mission missionId={missionId} userKey={userKey} className="mission" />
               <button className="whatIsThis" type="button" onClick={() => this.setState({ helpPage: true })}>
                 ?
               </button>

@@ -1,18 +1,25 @@
 import React, { Component } from 'react';
+import DailyMission from './DailyMission';
 
 class Mission extends Component {
   constructor(props) {
     super(props);
 
-    const { missionId } = this.props;
+    const { missionId, userKey } = this.props;
     this.state = {
       missionId,
       gameState: 'normal',
       page: '',
       charCount: 0,
+      userKey,
+      position: -1,
+      token: '',
+      sentYet: false,
     };
 
     this.handleChange = this.handleChange.bind(this);
+    this.checkWin = this.checkWin.bind(this);
+    this.sendFinalPlug = this.sendFinalPlug.bind(this);
   }
 
   handleChange(event) {
@@ -22,25 +29,43 @@ class Mission extends Component {
     });
   }
 
-  async checkWin(decision) {
-    // const { missionId } = this.state;
-    // const particpateURL = 'http://share-your-gig-dev.herokuapp.com/api/v1/missions/participate';
+  async checkWin(answer) {
+    const { missionId, userKey, position } = this.state;
+    const particpateURL = 'http://share-your-gig-dev.herokuapp.com/api/v1/missions/participate';
+    console.log(userKey);
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ answer, missionKey: userKey }),
+    };
 
-    // const requestOptions = {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ answer: '', missionKey: missionId }),
-    // };
+    const response = await fetch(particpateURL, requestOptions);
+    const json = await response.json();
+    console.log(json);
+    await this.setState({ gameState: json.response, position: json.position, token: json.successKey });
+  }
 
-    // const response = await fetch(particpateURL, requestOptions);
-    // const json = await response.json();
-    // // this.setState({ gameState: json });
-    await this.setState({ gameState: decision });
+  async sendFinalPlug() {
+    const { value, token } = this.state;
+    const particpateURL = 'http://share-your-gig-dev.herokuapp.com/api/v1/missions/winning-message/send-for-verification';
+
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: value, winningRedirectURLToken: token }),
+    };
+
+    const response = await fetch(particpateURL, requestOptions);
+    const json = await response.json();
+
+    if (json.response === 'success') {
+      this.setState({ sentYet: true });
+    }
   }
 
   render() {
     let {
-      missionId, gameState, page, value, charCount,
+      missionId, gameState, page, value, charCount, userKey, position,
     } = this.state;
 
     if (gameState === 'normal') {
@@ -50,10 +75,12 @@ class Mission extends Component {
           flexDirection: 'column',
         }}
         >
-          <button type="button">
+
+          <DailyMission missionId={missionId} checkWin={this.checkWin} />
+          {/* <button type="button">
             {missionId}
-          </button>
-          <button
+          </button> */}
+          {/* <button
             type="button"
             onClick={() => this.checkWin('loss')}
           >
@@ -76,10 +103,10 @@ class Mission extends Component {
             onClick={() => this.checkWin('winnerFound')}
           >
             click here to winner already found
-          </button>
+          </button> */}
         </div>
       );
-    } else if (gameState === 'loss') {
+    } else if (gameState === 'MissionNotSelectedAnswer') {
       page = (
         <div className="mainCopy">
           <div style={{
@@ -88,12 +115,12 @@ class Mission extends Component {
             fontWeight: 700,
           }}
           >
-            #5
+            {`#${position}`}
           </div>
           <div>Try again tomorrow!</div>
         </div>
       );
-    } else if (gameState === 'win') {
+    } else if (gameState === 'success') {
       page = (
         <div style={{
           display: 'flex',
@@ -102,67 +129,79 @@ class Mission extends Component {
           justifyContent: 'space-around',
         }}
         >
+
           <div className="helpNumber">
             You win!
           </div>
-          <div className="helpCopy">
-            Congratulations, you can now send a message to everyone.
-            <br />
-            <br />
-            Some fun examples:
-            <li>Send over your latest instagram post</li>
-            <li>Your new Spotify Track</li>
-            <li>A nice complement 😊</li>
 
-            <span style={{
-              color: 'red',
-              fontSize: '20px',
-            }}
-            >
-              Don’t refresh your browser.
-            </span>
-          </div>
-          <div>
-            <fieldset>
-              <legend>Plug Your Gig!</legend>
-              <textarea className="messageInput" value={value || ''} onChange={this.handleChange} maxLength="280" />
-            </fieldset>
-            <div
-              style={{
-                fontSize: '13px',
-                textAlign: 'right',
-              }}
-            >
-              {charCount}
-              /280
+          {sentYet
+            ? (
+              <div>
+                <div className="helpCopy">
+                  Congratulations, you can now send a message to everyone.
+                  <br />
+                  <br />
+                  Some fun examples:
+                  <li>Send over your latest instagram post</li>
+                  <li>Your new Spotify Track</li>
+                  <li>A nice complement 😊</li>
 
-            </div>
-          </div>
-          <button
-            style={{
-              padding: '10px 20px',
-              marginTop: '10px',
-              backgroundColor: '#282A37',
-              color: '#FFFFFF',
-              borderRadius: '35px',
-            }}
-            type="button"
-            onClick={this.sendVerificationText}
-          >
-            Send!
-          </button>
+                  <span style={{
+                    color: 'red',
+                    fontSize: '20px',
+                  }}
+                  >
+                    Don’t refresh your browser.
+                  </span>
+                </div>
+                <div>
+                  <fieldset>
+                    <legend>Plug Your Gig!</legend>
+                    <textarea className="messageInput" value={value || ''} onChange={this.handleChange} maxLength="280" />
+                  </fieldset>
+                  <div
+                    style={{
+                      fontSize: '13px',
+                      textAlign: 'right',
+                    }}
+                  >
+                    {charCount}
+                    /280
+
+                  </div>
+                </div>
+                <button
+                  style={{
+                    padding: '10px 20px',
+                    marginTop: '10px',
+                    backgroundColor: '#282A37',
+                    color: '#FFFFFF',
+                    borderRadius: '35px',
+                  }}
+                  type="button"
+                  onClick={() => { this.sendFinalPlug(); }}
+                >
+                  Send!
+                </button>
+              </div>
+            )
+            : (
+              <div>
+                Sent the message
+              </div>
+            )}
         </div>
       );
     } else if (gameState === 'winnerFound') {
       page = (
         <div className="mainCopy">
-          <div style={{textAlign:"center"}}>Today’s mission is over. The next one will be released shortly!</div>
+          <div style={{ textAlign: 'center' }}>Today’s mission is over. The next one will be released shortly!</div>
         </div>
       );
-    } else if (gameState === 'expired') {
+    } else if (gameState === 'MissionEnded') {
       page = (
         <div className="mainCopy">
-          <div style={{textAlign:"center"}}>This link has already expired. Please try again next time!</div>
+          <div style={{ textAlign: 'center' }}>This link has already expired. Please try again next time!</div>
         </div>
       );
     }
